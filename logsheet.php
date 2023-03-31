@@ -378,6 +378,10 @@ if ($_SESSION["LoginUserRole"] == 0) {
 						color: red;
 					}
 
+					.btnExport:hover {
+						color: blue;
+					}
+
 					.btnDelete {
 						border: 0;
 						float: right;
@@ -403,8 +407,6 @@ if ($_SESSION["LoginUserRole"] == 0) {
 					}
                 </style>
                 <script>
-					var editing = 0;
-
 					//when the date is null, the border of datePicker will become red
 					//run changeDate(x) when user select a date
                     function changeDate(x) {
@@ -419,9 +421,12 @@ if ($_SESSION["LoginUserRole"] == 0) {
 					
 					//edit logsheet
                     function modify(x) {
+						const allBtnExports = document.getElementsByClassName("btnExport");
+						const allBtnModifys = document.getElementsByClassName("btnModify");
+						const allBtnDeletes = document.getElementsByClassName("btnDelete");
+						const btnNew = document.getElementById("btnNew");
                         const datePicker = document.getElementById("datePicker"+x);
                         const date = document.getElementById("date"+x);
-                        const btnModify = document.getElementById("btnModify"+x);
                         const btnConfirm = document.getElementById("btnConfirm"+x);
                         const btnCancel = document.getElementById("btnCancel"+x);
                         const content1 = document.getElementById("content1"+x);
@@ -430,28 +435,29 @@ if ($_SESSION["LoginUserRole"] == 0) {
                         const oldContent1 = document.getElementById("oldContent1");
 						const oldContent2 = document.getElementById("oldContent2");
 						const oldContent3 = document.getElementById("oldContent3");
-        
-						if (editing != 0) {	//editing another logsheet
-							alert("You are editing another logsheet!");
-							document.getElementById("details"+editing).style.border = "3px solid #d50000";
-							//scroll to editing logsheet
-							window.scrollTo(0, getOffset(document.getElementById("details"+editing)).top-125);
-						} else {
-							editing = x;
-							btnModify.style.display = "none";
-							btnConfirm.style.display = "inline";
-							btnCancel.style.display = "inline";
-							date.style.display = "none"
-							datePicker.value = date.innerHTML;
-							date.value = "";
-							datePicker.style.display = "inline";
-							oldContent1.value = content1.value;
-							content1.readOnly = false;
-							oldContent2.value = content2.value;
-							content2.readOnly = false;
-							oldContent3.value = content3.value;
-							content3.readOnly = false;
+
+						for (var i=0; i<allBtnExports.length; i++){
+							allBtnExports[i].style.display = "none";
 						}
+						for (var i=0; i<allBtnModifys.length; i++){
+							allBtnModifys[i].style.display = "none";
+						}
+						for (var i=0; i<allBtnDeletes.length; i++){
+							allBtnDeletes[i].style.display = "none";
+						}
+						btnNew.style.display = "none";
+						btnConfirm.style.display = "inline";
+						btnCancel.style.display = "inline";
+						date.style.display = "none"
+						datePicker.value = date.innerHTML;
+						date.value = "";
+						datePicker.style.display = "inline";
+						oldContent1.value = content1.value;
+						content1.readOnly = false;
+						oldContent2.value = content2.value;
+						content2.readOnly = false;
+						oldContent3.value = content3.value;
+						content3.readOnly = false;
                     }
 					
 					//confirm editing logsheet
@@ -461,7 +467,6 @@ if ($_SESSION["LoginUserRole"] == 0) {
 						const errorMsg = document.getElementById("errorMsg"+x);
                         
                         if(datePicker.value) {	//the date is not null
-							editing = 0;
 							form.submit();
                         } else {	//the date is null
                             datePicker.style.borderColor = "#d50000";
@@ -472,11 +477,14 @@ if ($_SESSION["LoginUserRole"] == 0) {
 					
 					//cancel editing logsheet
                     function cancelEditing(x) {
+						const allBtnExports = document.getElementsByClassName("btnExport");
+						const allBtnModifys = document.getElementsByClassName("btnModify");
+						const allBtnCancels = document.getElementsByClassName("btnCancel");
+						const allBtnConfirms = document.getElementsByClassName("btnConfirm");
+						const allBtnDeletes = document.getElementsByClassName("btnDelete");
+						const btnNew = document.getElementById("btnNew");
                         const datePicker = document.getElementById("datePicker"+x);
                         const date = document.getElementById("date"+x);
-                        const btnModify = document.getElementById("btnModify"+x);
-                        const btnConfirm = document.getElementById("btnConfirm"+x);
-                        const btnCancel = document.getElementById("btnCancel"+x);
                         const content1 = document.getElementById("content1"+x);
 						const content2 = document.getElementById("content2"+x);
 						const content3 = document.getElementById("content3"+x);
@@ -484,57 +492,81 @@ if ($_SESSION["LoginUserRole"] == 0) {
 						const oldContent2 = document.getElementById("oldContent2");
 						const oldContent3 = document.getElementById("oldContent3");
         
+						for (var i=0; i<allBtnExports.length; i++){
+							allBtnExports[i].style.display = "inline";
+						}
+						for (var i=0; i<allBtnModifys.length; i++){
+							allBtnModifys[i].style.display = "inline";
+						}
+						for (var i=0; i<allBtnCancels.length; i++){
+							allBtnCancels[i].style.display = "none";
+						}
+						for (var i=0; i<allBtnConfirms.length; i++){
+							allBtnConfirms[i].style.display = "none";
+						}
+						for (var i=0; i<allBtnDeletes.length; i++){
+							allBtnDeletes[i].style.display = "inline";
+						}
+						btnNew.style.display = "inline";
                         datePicker.style.display = "none";
                         date.style.display = "inline";
-                        btnConfirm.style.display = "none";
-                        btnCancel.style.display = "none";
-                        btnModify.style.display = "inline";
                         content1.readOnly = true;
                         content1.value = oldContent1.value;
 						content2.readOnly = true;
                         content2.value = oldContent1.value;
 						content3.readOnly = true;
                         content3.value = oldContent1.value;
-						document.getElementById("details"+editing).style.border = "0px";
-						editing = 0;
                     }
 
 					//add new logsheet
                     function add() {
-						if (editing != 0) {	//editing a logsheet
-							alert("You are editing a logsheet!");
-							document.getElementById("details"+editing).style.border = "3px solid #d50000";
-							//scroll to editing logsheet
-							window.scrollTo(0, getOffset(document.getElementById("details"+editing)).top-125);
-						} else {
-							window.location.replace("addLogsheet.php");
-						}
+						window.location.replace("addLogsheet.php");
                     }
-
-					//use for auto scroll
-					function getOffset(el) {
-						const rect = el.getBoundingClientRect();
-						return {
-							left: rect.left + window.scrollX,
-							top: rect.top + window.scrollY
-						};
-					}
 
 					//delete logsheet
 					function deleteLogsheet(x) {
                         const form = document.getElementById("deleteForm"+x);
-
-						if (editing != 0) {	//editing a logsheet
-							alert("You are editing a logsheet!");
-							document.getElementById("details"+editing).style.border = "3px solid #d50000";
-							//scroll to editing logsheet
-							window.scrollTo(0, getOffset(document.getElementById("details"+editing)).top-125);
-						} else {
-							if (confirm("Are you sure you want to delete the logsheet?")) {
-								form.submit();
-							}
+						if (confirm("Are you sure you want to delete the logsheet?")) {
+							form.submit();
 						}
                     }
+
+					//Export logsheet to word
+					function Export2Word(element, filename = ''){
+						var preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export HTML To Doc</title></head><body>";
+						var postHtml = "</body></html>";
+						var html = preHtml+document.getElementById(element).innerHTML+postHtml;
+
+						var blob = new Blob(['\ufeff', html], {
+							type: 'application/msword'
+						});
+						
+						// Specify link url
+						var url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(html);
+						
+						// Specify file name
+						filename = filename?filename+'.doc':'document.doc';
+						
+						// Create download link element
+						var downloadLink = document.createElement("a");
+
+						document.body.appendChild(downloadLink);
+						
+						if(navigator.msSaveOrOpenBlob ){
+							navigator.msSaveOrOpenBlob(blob, filename);
+						}else{
+							// Create a link to the file
+							downloadLink.href = url;
+							
+							// Setting the file name
+							downloadLink.download = filename;
+							
+							//triggering the function
+							downloadLink.click();
+						}
+						
+						document.body.removeChild(downloadLink);
+					}
                 </script>
                 <?php
 					//database connection (need to change)
@@ -547,6 +579,40 @@ if ($_SESSION["LoginUserRole"] == 0) {
 					
 					//group ID (need to change)
 					$groupID = $_SESSION["GroupID"];
+
+					//get fyp id and name
+					$sql = 'SELECT * FROM fyp WHERE group_id=' . $groupID;
+					$rs = mysqli_query($conn, $sql);
+					$rc = mysqli_fetch_assoc($rs);
+
+					$fypID = $rc['fypID'];
+					$fypName = $rc['FYPName'];
+
+					//get supervisor name
+					$sql = 'SELECT user.user_name AS "userName" FROM user INNER JOIN project_group ON user.user_id = project_group.supervisor_id WHERE project_group.group_id=' . $groupID . '';
+					$rs = mysqli_query($conn, $sql);
+					$rc = mysqli_fetch_assoc($rs);
+
+					$svName = $rc['userName'];
+
+					//get student in group
+					$sql = 'SELECT user.user_name AS "userName" FROM user INNER JOIN student_in_group ON user.user_id = student_in_group.student_id WHERE student_in_group.group_id=' . $groupID . '';
+					$rs = mysqli_query($conn, $sql);
+
+					$sig = array();
+					while ($rc = mysqli_fetch_assoc($rs)) {
+						array_push($sig, $rc['userName']);
+					}
+					$strSIG = "";
+					$length = count($sig);
+					for ($i = 0; $i < $length; $i++) {
+						$strSIG = $strSIG . $sig[$i];
+						if ($i + 1 == $length) {
+							$strSIG = $strSIG . ".";
+						} else {
+							$strSIG = $strSIG . ", ";
+						}
+					}
 
 					//get logsheet from database
 					$sql = 'SELECT * FROM logsheet WHERE groupID=' . $groupID . ' ORDER BY date';
@@ -569,6 +635,9 @@ if ($_SESSION["LoginUserRole"] == 0) {
 										<text id="errorMsg$logsheetID" class="errorMsg">*</text>
 										<input id="datePicker$logsheetID" type="date" name="date" max="$today" onchange="changeDate($logsheetID)" style="display:none;" />
 										<text id="date$logsheetID">$date</text>
+										<button id="btnExport$logsheetID" class="btnExport" type="button" title="Export to word" onclick="Export2Word('exportContent$logsheetID', 'Group$groupID-Logsheet$logsheetID')">
+											<i class="fa fa-file-word-o"></i>
+										</button>
 										<button id="btnModify$logsheetID" class="btnModify" type="button" title="Edit logsheet" onclick="modify($logsheetID)">
 											<i class="fa fa-edit"></i>
 										</button>
@@ -596,6 +665,143 @@ if ($_SESSION["LoginUserRole"] == 0) {
 								</button>
 								<input name="logsheetID" type="hidden" value="$logsheetID" />
 							</form>
+EOD;
+						//for export to word
+						echo <<<EOD
+							<div id="exportContent$logsheetID" style="display: none">
+								<p style='margin-right:11.5pt;margin-bottom:0cm;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;margin-top:6.0pt;text-align:center;'><strong><span style='font-size:17px;font-family:"Times New Roman",serif;'>Hong Kong Institute of Vocational Education</span></strong></p>
+								<p style='margin-right:11.5pt;margin-bottom:0cm;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;margin-top:6.0pt;text-align:center;'><strong><span style='font-size:17px;font-family:"Times New Roman",serif;'>Discipline of Information Technology</span></strong></p>
+								<p style='margin-right:11.5pt;margin-bottom:0cm;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;margin-top:6.0pt;text-align:center;line-height:12.25pt;'><strong><u><span style='font-family:"Times New Roman",serif;'>Final Year Project - Log Sheet (No. &nbsp; $logsheetID &nbsp;)</span></u></strong></p>
+								<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>&nbsp;</p>
+								<table style="border-collapse:collapse;border:none;">
+									<tbody>
+										<tr>
+											<td style="width: 221.4pt;border: none;padding: 0cm 5.4pt;vertical-align: top;">
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>Course/Class: <u>IT114105/2B</u></p>
+											</td>
+											<td style="width: 221.4pt;border: none;padding: 0cm 5.4pt;vertical-align: top;">
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>Project ID: <u>$fypID</u></p>
+											</td>
+										</tr>
+										<tr>
+											<td style="width: 221.4pt;border: none;padding: 0cm 5.4pt;vertical-align: top;">
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>Supervisor: <u>$svName</u></p>
+											</td>
+											<td style="width: 221.4pt;border: none;padding: 0cm 5.4pt;vertical-align: top;">
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>Date: <u>$date</u></p>
+											</td>
+										</tr>
+										<tr>
+											<td colspan="2" style="width: 442.8pt;border: none;padding: 0cm 5.4pt;vertical-align: top;">
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>Project Title: <u>$fypName</u></p>
+											</td>
+										</tr>
+										<tr>
+											<td colspan="2" style="width: 442.8pt;border: none;padding: 0cm 5.4pt;height: 16.7pt;vertical-align: top;">
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>Student Name(s): <u>$strSIG</u></p>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+								<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>&nbsp;</p>
+								<table style="width:473.4pt;border-collapse:collapse;border:none;">
+									<tbody>
+										<tr>
+											<td style="width: 383.4pt;border: 1pt solid windowtext;padding: 0cm 5.4pt;vertical-align: top;">
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>Work done &amp; findings since last recording</p>
+											</td>
+											<td style="width: 90pt;border-top: 1pt solid windowtext;border-right: 1pt solid windowtext;border-bottom: 1pt solid windowtext;border-image: initial;border-left: none;padding: 0cm 5.4pt;vertical-align: top;">
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>Logged by</p>
+											</td>
+										</tr>
+										<tr>
+											<td style="width: 383.4pt;border-right: 1pt solid windowtext;border-bottom: 1pt solid windowtext;border-left: 1pt solid windowtext;border-image: initial;border-top: none;padding: 0cm 5.4pt;vertical-align: top;">
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>$content1</p>
+											</td>
+											<td style="width: 90pt;border-top: none;border-left: none;border-bottom: 1pt solid windowtext;border-right: 1pt solid windowtext;padding: 0cm 5.4pt;vertical-align: top;">
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>&nbsp;</p>
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>&nbsp;</p>
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>&nbsp;</p>
+											</td>
+										</tr>
+										<tr>
+											<td style="width: 383.4pt;border-right: 1pt solid windowtext;border-bottom: 1pt solid windowtext;border-left: 1pt solid windowtext;border-image: initial;border-top: none;padding: 0cm 5.4pt;vertical-align: top;">
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>State which part of the last plan not yet finished (leave it blank if you finished all the work of the last plan</p>
+											</td>
+											<td style="width: 90pt;border-top: none;border-left: none;border-bottom: 1pt solid windowtext;border-right: 1pt solid windowtext;padding: 0cm 5.4pt;vertical-align: top;">
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>Logged by</p>
+											</td>
+										</tr>
+										<tr>
+											<td style="width: 383.4pt;border-right: 1pt solid windowtext;border-bottom: 1pt solid windowtext;border-left: 1pt solid windowtext;border-image: initial;border-top: none;padding: 0cm 5.4pt;vertical-align: top;">
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>$content2</p>
+											</td>
+											<td style="width: 90pt;border-top: none;border-left: none;border-bottom: 1pt solid windowtext;border-right: 1pt solid windowtext;padding: 0cm 5.4pt;vertical-align: top;">
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>&nbsp;</p>
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>&nbsp;</p>
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>&nbsp;</p>
+											</td>
+										</tr>
+										<tr>
+											<td style="width: 383.4pt;border-right: 1pt solid windowtext;border-bottom: 1pt solid windowtext;border-left: 1pt solid windowtext;border-image: initial;border-top: none;padding: 0cm 5.4pt;vertical-align: top;">
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>Plan of work before the next recording</p>
+											</td>
+											<td style="width: 90pt;border-top: none;border-left: none;border-bottom: 1pt solid windowtext;border-right: 1pt solid windowtext;padding: 0cm 5.4pt;vertical-align: top;">
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>Logged by</p>
+											</td>
+										</tr>
+										<tr>
+											<td style="width: 383.4pt;border-right: 1pt solid windowtext;border-bottom: 1pt solid windowtext;border-left: 1pt solid windowtext;border-image: initial;border-top: none;padding: 0cm 5.4pt;vertical-align: top;">
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>$content3</p>
+											</td>
+											<td style="width: 90pt;border-top: none;border-left: none;border-bottom: 1pt solid windowtext;border-right: 1pt solid windowtext;padding: 0cm 5.4pt;vertical-align: top;">
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>&nbsp;</p>
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>&nbsp;</p>
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>&nbsp;</p>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+								<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>&nbsp;</p>
+								<table style="width:473.4pt;border-collapse:collapse;border:none;">
+									<tbody>
+										<tr>
+											<td style="width: 473.4pt;border: 1pt solid windowtext;padding: 0cm 5.4pt;vertical-align: top;">
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>Supervisor&rsquo;s comment on student&rsquo;s work</p>
+											</td>
+										</tr>
+										<tr>
+											<td style="width: 473.4pt;border-right: 1pt solid windowtext;border-bottom: 1pt solid windowtext;border-left: 1pt solid windowtext;border-image: initial;border-top: none;padding: 0cm 5.4pt;vertical-align: top;">
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>&nbsp;</p>
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>&nbsp;</p>
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>&nbsp;</p>
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>&nbsp;</p>
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>&nbsp;</p>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+								<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>&nbsp;</p>
+								<table style="width:473.4pt;border-collapse:collapse;border:none;">
+									<tbody>
+										<tr>
+											<td style="width: 230.4pt;border: 1pt solid windowtext;padding: 0cm 5.4pt;height: 89.95pt;vertical-align: top;">
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>Student&rsquo;s Signature:</p>
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>&nbsp;</p>
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>&nbsp;</p>
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>&nbsp;</p>
+											</td>
+											<td style="width: 18pt;border-top: none;border-bottom: none;border-left: none;border-image: initial;border-right: 1pt solid windowtext;padding: 0cm 5.4pt;height: 89.95pt;vertical-align: top;">
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>&nbsp;</p>
+											</td>
+											<td style="width: 225pt;border-top: 1pt solid windowtext;border-right: 1pt solid windowtext;border-bottom: 1pt solid windowtext;border-image: initial;border-left: none;padding: 0cm 5.4pt;height: 89.95pt;vertical-align: top;">
+												<p style='margin-right:0cm;margin-bottom:5.75pt;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>Supervisor Signature</p>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+								<p style='margin-right:0cm;margin-bottom:0cm;margin-left:0cm;font-size:16px;font-family:"Times New Roman",serif;margin:0cm;'>&nbsp;</p>
+							</div>
 EOD;
 					}
 					echo <<<EOD
