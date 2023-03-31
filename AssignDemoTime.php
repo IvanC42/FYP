@@ -148,7 +148,7 @@ session_start();
 						<div class="default-tab">
 							<ul class="nav nav-tabs" role="tablist">
 								<li class="nav-item">
-									<a class="nav-link active" data-toggle="tab" href="#Planning"><i class="la la-file-text mr-2"></i>Assign Supervisor</a>
+									<a class="nav-link active" data-toggle="tab" href="#Planning"><i class="la la-file-text mr-2"></i>Assign DemoTime</a>
 								</li>
 								
 							</ul>
@@ -195,8 +195,7 @@ session_start();
 							
 
 						</ul>
-
-						<ul aria-expanded="false">
+                        <ul aria-expanded="false">
 							<li><a href="AssignDemoTime.php">Assign Demostration Time </a></li>
 							
 
@@ -218,7 +217,7 @@ session_start();
 
 			<div class="container-fluid">
 				<!-- Add Project -->
-				<div class="table-responsive" >
+				<div class="table-responsive">
 					<table class="table table-responsive-md" id="styledTable">
 						<thead>
 							<tr>
@@ -226,32 +225,29 @@ session_start();
 								<th><strong>Member</strong></th>
 								<th><strong>LeaderName</strong></th>
                                 <th><strong>Supervisor</strong></th>
+                                <th><strong>Date</strong></th>
+                                <th><strong>Time</strong></th>
 								<th></th>
 							</tr>
 						</thead>
-						<form action="assignS.php" method="POST">
+						<form action="assignTime.php" method="POST">
 						<tbody>
 						<button type="submit" class="btn btn-rounded btn-primary" id="btn2" hidden
 							><span class="btn-icon-left text-primary"><i class="fa fa-plus "></i>
 							</span>Confirm</button>
                             <?php
-														function randomName() {
-															$conn = mysqli_connect("127.0.0.1","root","","fyp");
-															$sql = "SELECT user_name FROM user WHERE role=1 OR role=3";
-															$rs=mysqli_query($conn,$sql);
-															$names = array();
-															while($rc=mysqli_fetch_assoc($rs)){
-																array_push($names,$rc['user_name']);
-															}
-																return $names[rand ( 0 , count($names) -1)];
-															}
-															$conn = mysqli_connect("127.0.0.1","root","","fyp");
-															$sql = "SELECT user_name FROM user WHERE role=1 OR role=3";
-															$rs=mysqli_query($conn,$sql);
-															$names = array();
-															while($rc=mysqli_fetch_assoc($rs)){
-																array_push($names,$rc['user_name']);
-															}
+							
+							function randomName() {
+						    $conn = mysqli_connect("127.0.0.1","root","","fyp");
+                            $sql = "SELECT user_name FROM user WHERE role=1";
+                            $rs=mysqli_query($conn,$sql);
+							$names = array();
+							while($rc=mysqli_fetch_assoc($rs)){
+								array_push($names,$rc['user_name']);
+							}
+								return $names[rand ( 0 , count($names) -1)];
+							}
+                
                             $conn = mysqli_connect("127.0.0.1","root","","fyp");
                             $sql1 = "SELECT group_ID FROM project_group ";
                             $rs=mysqli_query($conn,$sql1);
@@ -263,14 +259,22 @@ session_start();
 								$sql3="SELECT student_id,user_name FROM student_in_group,user WHERE student_in_group.student_id=user.user_id AND student_in_group.role=1 and group_id=$groupID ";
 								$rs3=mysqli_query($conn,$sql3);
 								$memeber=array();
-								$name=randomName();
+                                $sql4="SELECT user_name from project_group , user WHERE project_group.supervisor_id=user_id AND group_id='$groupID' ";
+                                $rs4=mysqli_query($conn,$sql4);
+                                $rc4=mysqli_fetch_assoc($rs4);
+                                $year=2023;                          
+                                $month= mt_rand(4,4);                           
+                                $day= mt_rand(18, 28);                         
+                                $randomDate = $year . "-" . $month . "-" . $day;
+                                $randomTime=rand(8,17).":".str_pad(rand(0,0), 2, "0", STR_PAD_LEFT);      
 								while($rc3=mysqli_fetch_assoc($rs3)){
 									array_push($memeber,$rc3['user_name']);
 								}
                                 echo "<tr>	
 								<td><strong>$groupID</strong></td>
 								<input type='hidden' name='groupID[]' value='$groupID'>
-								<input type='hidden' name='superivsor[]' value='$name'>
+                                <input type='hidden' name='date[]' value='$randomDate'>
+                                <input type='hidden' name='time[]' value='$randomTime'>
 								<td><div class='d-flex align-items-center'><span class='w-space-no'</span>";
 								foreach ($memeber as $value){
 									echo "$value <br>" ;
@@ -278,29 +282,29 @@ session_start();
 								echo "
 								</div></td>
 								<td>".$rc2['user_name']."</td>";
-                               echo "<td class='supervisor'>";
-							   echo "<p hidden id='hide'>";
-							   echo $name;
-							   echo "<p></td>";
+                               echo "<td><p id=supervisor name='supervisor[]'>";
+							   echo $rc4['user_name'];
+							   echo "</p></td><td><a hidden id=radomDate >";
+                               echo $randomDate;
+                               echo "</td><td></a><a hidden id=radomTime >";
+                               echo $randomTime;
+                               echo "</a></td>";
 							echo "</tr>";
                             }
 							
                             ?>
 						</tbody>
 					</table>
-					<button type="button" class="btn btn-rounded btn-primary" id="btn" onclick="generateName()"
+						</form>
+					<button type="button" class="btn btn-rounded btn-primary" id="btn"
 							><span class="btn-icon-left text-primary"><i class="fa fa-plus "></i>
 							</span>Assign</button>
-						</form>
 							<button class="btn" class="btn btn-rounded btn-primary"  onclick="downloadPDFWithjsPDF()"><span class="btn-icon-left text-primary"><i class="fa fa-file-pdf-o" aria-hidden="true"></i>Export PDF</span></button>
 										</button>
 				</div>
             </div>
         </div>
     </div>
-	
-	
-
 
     <!--**********************************
         Main wrapper end
@@ -320,25 +324,21 @@ session_start();
 	<script src="js/deznav-init.js"></script>
     <script src="js/demo.js"></script>
 	<script type ="text/javascript">
-function getRandomInt(min, max) {
-  	return Math.floor(Math.random() * (max - min)) + min;
-}
-
-function generateName(){
-  document.getElementById('btn2').removeAttribute('hidden');
-  $("p").removeAttr('hidden');
-}
-function downloadPDFWithjsPDF() {
+			 $("#btn").click(function () {
+				$("a").removeAttr("hidden");
+				$("#btn2").removeAttr("hidden");
+				$("#btn3").removeAttr("hidden");
+			});
+			function downloadPDFWithjsPDF() {
   var doc = new jspdf.jsPDF('l', 'pt', 'a0');
 
   doc.html(document.querySelector('#styledTable'), {
     callback: function (doc) {
-      doc.save('IT114105_FYP-Supervisor.pdf');
+      doc.save('IT114105_FYP-DemoTimeTable.pdf');
 
     },
   });
 }
-
 	</script>
 </body>
 </html>
